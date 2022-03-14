@@ -30,14 +30,14 @@ function App() {
 
   useEffect(() => {
     axios.get(API_URL).then((response) => {
-      console.log(response.data.data);
+      // console.log(response.data.data);
       setCountries(response.data.data);
     });
   }, []);
 
   useEffect(() => {
     axios.get(STATE_URL).then((response) => {
-      console.log(response.data.data);
+      // console.log(response.data.data);
       setState(response.data.data);
     });
   }, []);
@@ -50,7 +50,7 @@ function App() {
           state: selectedState.split(" ")[0],
         })
         .then((data) => {
-          console.log(data.data.data);
+          // console.log(data.data.data);
           setCity(data.data.data);
         });
     };
@@ -60,7 +60,17 @@ function App() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    setShow(true);
+    const data = [mail, selectedCountry, selectedState, selectedCities];
+    if (
+      mail === "" ||
+      selectedCountry === "" ||
+      selectedState === "" ||
+      selectedCities === ""
+    ) {
+      setShow(true);
+    } else {
+      localStorage.setItem("FormData", JSON.stringify(data));
+    }
   };
 
   return (

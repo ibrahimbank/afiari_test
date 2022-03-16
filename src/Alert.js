@@ -1,10 +1,10 @@
 import React from "react";
 
-function Alert() {
+function Alert({ detail }) {
   return (
     <div className="alert">
       <h2 className="alert_heading">Alert</h2>
-      <p className="alert_para">Choose a state to continue</p>
+      <p className="alert_para">{detail}</p>
       <p className="ok">ok</p>
     </div>
   );

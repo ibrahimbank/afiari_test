@@ -4,8 +4,10 @@ import axios from "axios";
 import edit from "./assest/edit.png";
 import deleteBtn from "./assest/delete.png";
 import Alert from "./Alert";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 function App() {
+  const [show, setShow] = useState(false);
   const [countries, setCountries] = useState([]);
   const [state, setState] = useState([]);
   const [city, setCity] = useState([]);
@@ -13,14 +15,25 @@ function App() {
   const [selectedCountry, setSelectedCountry] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
 
+  const [countryImage, setCountryImage] = useState([]);
+
   const [mail, setMail] = useState("");
-  const [show, setShow] = useState(false);
+
+  const [showCountry, setShowCountry] = useState(false);
+  const [showState, setShowState] = useState(false);
+  const [showCity, setShowCity] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    country: "",
+    state: "",
+    city: "",
+  });
+
+  const { email, country, state: countryState, city: Statecity } = formData;
 
   const avaState = state.find((c) => c.name === selectedCountry);
 
   const avaCity = avaState?.states?.find((c) => c.name === selectedState);
-
-  // console.log(avaCity);
 
   const API_URL = "https://countriesnow.space/api/v0.1/countries/flag/images";
 
@@ -30,14 +43,12 @@ function App() {
 
   useEffect(() => {
     axios.get(API_URL).then((response) => {
-      // console.log(response.data.data);
       setCountries(response.data.data);
     });
   }, []);
 
   useEffect(() => {
     axios.get(STATE_URL).then((response) => {
-      // console.log(response.data.data);
       setState(response.data.data);
     });
   }, []);
@@ -50,7 +61,6 @@ function App() {
           state: selectedState.split(" ")[0],
         })
         .then((data) => {
-          // console.log(data.data.data);
           setCity(data.data.data);
         });
     };
@@ -58,18 +68,38 @@ function App() {
     fetchData();
   }, [selectedCountry, selectedState]);
 
+  // useEffect(() => {
+
+  // });
+
+  const handleClick = () => {
+    if (!showCountry) setShowCountry(true);
+    else setShowCountry(false);
+  };
+
+  const handleState = () => {
+    if (!showState) setShowState(true);
+    else setShowState(false);
+  };
+
+  const handleCity = () => {
+    if (!showCity) setShowCity(true);
+    else setShowCity(false);
+  };
+
   const onSubmit = (e) => {
     e.preventDefault();
-    const data = [mail, selectedCountry, selectedState, selectedCities];
-    if (
-      mail === "" ||
-      selectedCountry === "" ||
-      selectedState === "" ||
-      selectedCities === ""
-    ) {
+    setFormData({
+      email: mail,
+      country: selectedCountry,
+      countryState: selectedState,
+      Statecity: selectedCities,
+    });
+
+    if (email === "" || selectedCountry === "") {
       setShow(true);
     } else {
-      localStorage.setItem("FormData", JSON.stringify(data));
+      localStorage.setItem("FormData", JSON.stringify(formData));
     }
   };
 
@@ -86,80 +116,139 @@ function App() {
 
         <div className="form_wrapper">
           <h2 className="heading">Let’s know you more</h2>
-          <p>Fill the appropriate details</p>
+          <p className="sub__heading">Fill the appropriate details</p>
           <form className="form" onSubmit={onSubmit}>
             <div className="input_wrapper">
               <input
                 type="text"
                 className="input_text"
                 onChange={(e) => setMail(e.target.value)}
+                contentEditable
               />
               <label className="label" htmlFor="email">
                 Email
               </label>
             </div>
 
-            <div className="input_wrapper">
-              <select
+            {/* Country select  */}
+            <div
+              value={selectedCountry}
+              onChange={(e) => e.target.value}
+              className="input_wrapper"
+              onClick={handleClick}
+            >
+              <div
                 name="country"
-                className="input_text"
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
+                className="input_text select__input"
+                contentEditable
               >
-                <option></option>
-                {countries.map((country) => (
-                  <>
-                    <option value={country.name} key={country.iso3}>
-                      {country.name}
-                    </option>
-                  </>
-                ))}
-              </select>
+                {showCountry === true && (
+                  <div className="list__wrapper" contentEditable="false">
+                    {countries.map((country, key) => (
+                      <>
+                        <div
+                          className="list__items"
+                          value={selectedCountry}
+                          key={key}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCountryImage(country.flag);
+                            setSelectedCountry(country.name);
+                          }}
+                        >
+                          <img className="img_flag" src={country.flag} alt="" />
+                          {country.name}
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                )}
+                {showCountry === true ? (
+                  <FaAngleUp className="angle__down" />
+                ) : (
+                  <FaAngleDown className="angle__down" />
+                )}
+
+                <img className="img_flag_div" src={countryImage} />
+              </div>
               <label className="label" htmlFor="country">
                 Country
               </label>
             </div>
 
-            <div className="input_wrapper">
-              <select
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
+            {/* State select */}
+
+            <div className="input_wrapper " onClick={handleState}>
+              <div
+                contentEditable
                 name="state"
-                className="input_text"
+                className="input_text select__input"
               >
-                <option></option>
-                {avaState?.states.map((e, key) => {
-                  return (
-                    <option value={e.name} key={key}>
-                      {e.name}
-                    </option>
-                  );
-                })}
-              </select>
+                {showState && (
+                  <div className="list__wrapper" contentEditable="false">
+                    {avaState?.states.map((e, key) => (
+                      <>
+                        <div
+                          className="list__items"
+                          value={e.name}
+                          key={key}
+                          onClick={() => {
+                            setSelectedState(e.name);
+                          }}
+                        >
+                          {e.name}
+                        </div>
+                      </>
+                    ))}
+                  </div>
+                )}
+              </div>
               <label className="label" htmlFor="state">
                 State
               </label>
+              {showState === true ? (
+                <FaAngleUp className="angle__down" />
+              ) : (
+                <FaAngleDown className="angle__down" />
+              )}
+
+              <p className="state_name">{selectedState}</p>
             </div>
 
-            <div className="input_wrapper">
-              <select
+            {/* Select cities */}
+
+            <div className="input_wrapper" onClick={handleCity}>
+              <div
                 name="city"
-                className="input_text"
-                value={selectedCities}
-                onChange={(e) => setSelectedCities(e.target.value)}
+                className="input_text select__input"
+                contentEditable
               >
-                <option></option>
-                {city?.map((e, key) => {
-                  return (
-                    <option value={e} key={key}>
-                      {e}
-                    </option>
-                  );
-                })}
-              </select>
+                {showCity === true && (
+                  <div className="list__wrapper" contentEditable="false">
+                    {city?.map((e, key) => (
+                      <div
+                        className="list__items"
+                        value={e}
+                        key={key}
+                        onClick={() => setSelectedCities(e)}
+                      >
+                        {e}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               <label className="label" htmlFor="city">
                 city/town
               </label>
+
+              {showCity === true ? (
+                <FaAngleUp className="angle__down" />
+              ) : (
+                <FaAngleDown className="angle__down" />
+              )}
+
+              <p className="state_name">{selectedCities}</p>
             </div>
 
             <button type="submit" className="input_text btn">
@@ -190,19 +279,29 @@ function App() {
             </div>
             <div className="city">
               <h6 className="result_heading"></h6>
-              <div className="images">
-                <img src={edit} alt="" className="img" />
-                <img src={deleteBtn} alt="" className="img" />
-              </div>
+              {selectedCities !== "" &&
+                selectedCountry !== "" &&
+                selectedState !== "" &&
+                mail !== "" && (
+                  <div className="images">
+                    <img src={edit} alt="" className="img" />
+                    <img src={deleteBtn} alt="" className="img" />
+                  </div>
+                )}
             </div>
           </div>
         </div>
       </div>
-      {show === true && (
+      {show === true && email === "" && (
         <div className="cover" onClick={() => setShow(false)}>
-          <Alert />
+          <Alert detail="Enter your mail" />
         </div>
       )}
+      {/* {show === true && country === "" && (
+        <div className="cover" onClick={() => setShow(false)}>
+          <Alert detail="Choose a country to continue" />
+        </div>
+      )} */}
     </div>
   );
 }

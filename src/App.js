@@ -281,10 +281,10 @@ function App() {
                   ? "input_text btn"
                   : "input_text btn_btn"
               }
-disabled={ mail !== "" ||
-                selectedCountry !== "" ||
-                selectedState !== "" ||
-                selectedCities !== "" ? false : true}
+disabled={ mail === "" ||
+                selectedCountry === "" ||
+                selectedState === "" ||
+                selectedCities === ""}
             >
               Submit
             </button>

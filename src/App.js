@@ -284,7 +284,7 @@ function App() {
 disabled={ mail !== "" ||
                 selectedCountry !== "" ||
                 selectedState !== "" ||
-                selectedCities !== "" ? true : false}
+                selectedCities !== "" ? false : true}
             >
               Submit
             </button>
